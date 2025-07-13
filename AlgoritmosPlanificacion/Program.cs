@@ -1,7 +1,7 @@
-﻿using AlgoritmosPlanificacion.Models;
-using static AlgoritmosPlanificacion.Algoritmos.RoundRobin;
-using static AlgoritmosPlanificacion.Algoritmos.PrioridadPreemptiva;
-using static AlgoritmosPlanificacion.Metricas.CalculadorMetricas;
+﻿using AlgoritmosPlanificacion.Escenarios;
+using AlgoritmosPlanificacion.Metricas;
+using AlgoritmosPlanificacion.Models;
+
 
 namespace AlgoritmosPlanificacion;
 
@@ -9,20 +9,31 @@ class Program
 {
     static void Main(string[] args)
     {
-        var escenario = EscenarioA(); // Cambiar por EscenarioB o EscenarioC
+        // Seleccionar el escenario a simular
+        Console.WriteLine("ESCENARIO 3");
+        var procesos = GeneradorEscenarios.Escenario3(); // Aquí se cambia por Escenario 1 - 2 - 3
 
-        Console.WriteLine("Simulando Round Robin (Quantum = 2)");
-        var copiaRR = CopiarProcesos(escenario);
-        var resultadoRR = SimularRoundRobin(copiaRR, 2);
-        MostrarMetricas(resultadoRR);
+        Console.WriteLine("\n--- PROCESOS INICIALES ---");
+        foreach (var p in procesos)
+            Console.WriteLine($"{p.Id} | Llegada: {p.TiempoLlegada} | Rafaga: {p.TiempoRafaga} | Prioridad: {p.Prioridad}");
 
-        Console.WriteLine("\nSimulando Prioridad Preemptiva");
-        var copiaPP = CopiarProcesos(escenario);
-        var resultadoPP = SimularPrioridadPreemptiva(copiaPP);
-        MostrarMetricas(resultadoPP); 
-        
+        // Simulación de Round Robin (Quantum = 2)
+        Console.WriteLine("\nSIMULANDO ROUND ROBIN (Quantum = 2)");
+        var copiaRR = CopiarProcesos(procesos);
+        var resultadosRR = Algoritmos.RoundRobin.SimularRoundRobin(copiaRR, 2);
+        CalculadorMetricas.MostrarMetricas(resultadosRR);
+
+        // Simulación de Prioridad Preemptiva
+        Console.WriteLine("\nSIMULANDO PRIORIDAD PREEMPTIVA");
+        var copiaPP = CopiarProcesos(procesos);
+        var resultadosPP = Algoritmos.PrioridadPreemptiva.SimularPrioridadPreemptiva(copiaPP);
+        CalculadorMetricas.MostrarMetricas(resultadosPP);
+
+        Console.WriteLine("\nPresiona cualquier tecla para salir...");
+        Console.ReadKey();
     }
-    
+
+    // Método para clonar la lista de procesos
     static List<Proceso> CopiarProcesos(List<Proceso> procesos)
     {
         return procesos.Select(p => new Proceso
@@ -34,12 +45,4 @@ class Program
             TiempoRestante = p.TiempoRafaga
         }).ToList();
     }
-
-    static List<Proceso> EscenarioA() => new List<Proceso>
-    {
-        new Proceso { Id = "P1", TiempoLlegada = 0, TiempoRafaga = 8, Prioridad = 2 },
-        new Proceso { Id = "P2", TiempoLlegada = 0, TiempoRafaga = 4, Prioridad = 1 },
-        new Proceso { Id = "P3", TiempoLlegada = 0, TiempoRafaga = 9, Prioridad = 3 }
-    }; 
-    
 }

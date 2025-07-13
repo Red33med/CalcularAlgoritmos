@@ -6,51 +6,62 @@ public class PrioridadPreemptiva
 {
     public static List<Proceso> SimularPrioridadPreemptiva(List<Proceso> procesos)
     {
-        var eventos = new List<(int tiempo, Proceso proceso)>();
-        var procesosActivos = new List<Proceso>(procesos);
-        int tiempoActual = 0;
-        Proceso ejecutando = null;
-
-        while (procesosActivos.Count > 0 || ejecutando != null)
+        // Inicializamos correctamente TiempoRestante si no se ha hecho antes
+        foreach (var p in procesos)
         {
-            // Añadir procesos que ya llegaron
-            var nuevos = procesosActivos.Where(p => p.TiempoLlegada == tiempoActual).ToList();
-            foreach (var p in nuevos)
+            p.TiempoRestante = p.TiempoRafaga;
+            p.TiempoInicio = -1;
+        }
+
+        var procesosPendientes = new List<Proceso>(procesos);
+        var resultados = new List<Proceso>();
+        Proceso ejecutando = null;
+        int tiempoActual = 0;
+
+        while (procesosPendientes.Count > 0 || ejecutando != null)
+        {
+            // Filtramos los procesos que ya llegaron
+            var disponibles = procesosPendientes
+                .Where(p => p.TiempoLlegada <= tiempoActual)
+                .OrderBy(p => p.Prioridad)
+                .ThenBy(p => p.TiempoLlegada)
+                .ToList();
+
+            if (disponibles.Count > 0)
             {
-                if (ejecutando == null || p.Prioridad < ejecutando.Prioridad) // Menor número = mayor prioridad
+                var mejor = disponibles.First();
+
+                if (ejecutando == null || mejor.Prioridad < ejecutando.Prioridad)
                 {
-                    if (ejecutando != null)
-                        procesosActivos.Add(ejecutando);
-                    ejecutando = p;
-                }
-                else
-                {
-                    procesosActivos.Add(p);
+                    if (ejecutando != null && ejecutando.TiempoRestante > 0)
+                        procesosPendientes.Add(ejecutando); // Reencolar el anterior
+
+                    ejecutando = mejor;
+                    procesosPendientes.Remove(mejor);
+
+                    if (ejecutando.TiempoInicio == -1)
+                        ejecutando.TiempoInicio = tiempoActual;
                 }
             }
-            procesosActivos.RemoveAll(p => p.TiempoLlegada == tiempoActual);
 
             if (ejecutando != null)
             {
-                if (ejecutando.TiempoInicio == -1)
-                    ejecutando.TiempoInicio = tiempoActual;
-
                 ejecutando.TiempoRestante--;
                 tiempoActual++;
 
                 if (ejecutando.TiempoRestante == 0)
                 {
                     ejecutando.TiempoFinalizacion = tiempoActual;
-                    eventos.Add((tiempoActual, ejecutando));
+                    resultados.Add(ejecutando);
                     ejecutando = null;
                 }
             }
             else
             {
-                tiempoActual++;
+                tiempoActual++; // Avanza el tiempo aunque no haya proceso ejecutando
             }
         }
 
-        return procesos;
-    } 
+        return resultados;
+    }
 }

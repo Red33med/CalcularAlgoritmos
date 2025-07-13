@@ -9,14 +9,14 @@ public class CalculadorMetricas
         double esperaProm = procesos.Average(p => p.TiempoEspera);
         double retornoProm = procesos.Average(p => p.TiempoRetorno);
         double respuestaProm = procesos.Average(p => p.TiempoRespuesta);
-        int tiempoTotalCpu = procesos.Sum(p => p.TiempoRafaga);
+        int tiempoTotalCPU = procesos.Sum(p => p.TiempoRafaga);
         int tiempoSimulacion = procesos.Max(p => p.TiempoFinalizacion);
-        double utilizacionCpu = (double)tiempoTotalCpu / tiempoSimulacion * 100;    
+        double utilizacionCPU = (double)tiempoTotalCPU / tiempoSimulacion * 100;
 
         Console.WriteLine($"\nMétricas:");
         Console.WriteLine($"Tiempo de espera promedio: {esperaProm:F2}");
         Console.WriteLine($"Tiempo de retorno promedio: {retornoProm:F2}");
         Console.WriteLine($"Tiempo de respuesta promedio: {respuestaProm:F2}");
-        Console.WriteLine($"Utilización de CPU: {utilizacionCpu:F2}%");
-    } 
+        Console.WriteLine($"Utilización de CPU: {utilizacionCPU:F2}%");
+    }
 }
