@@ -4,6 +4,8 @@ namespace AlgoritmosPlanificacion.Escenarios;
 
 public static class GeneradorEscenarios
 {
+    
+    // Llegadas cercanas con rafagas cortas
     public static List<Proceso> Escenario1()
     {
         return new List<Proceso>
@@ -15,6 +17,7 @@ public static class GeneradorEscenarios
         };
     }
 
+    // Llegadas escalonadas con ráfagas largas
     public static List<Proceso> Escenario2()
     {
         return new List<Proceso>
@@ -26,6 +29,7 @@ public static class GeneradorEscenarios
         };
     }
 
+    // Carga mixta con prioridades distinta 
     public static List<Proceso> Escenario3()
     {
         return new List<Proceso>
